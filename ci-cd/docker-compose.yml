@@ -36,18 +36,28 @@ services:
       - postgresql_data:/var/lib/postgresql/data
 
   jenkins:
-    image: jenkins/jenkins:lts
+    # image: jenkins/jenkins:lts
+    image: jenkins/jenkins:lts-jdk17
     privileged: true
     user: root
     networks:
       - cicd-net
     ports:
-      - 8080:8080
+      - 8000:8080
       - 50000:50000    
     container_name: jenkins
     volumes:
       - jenkins_home:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
+  agent:
+    image: jenkins/ssh-agent:jdk17
+    privileged: true
+    user: root
+    container_name: agent
+    expose:
+      - 22
+    environment:
+      - JENKINS_AGENT_SSH_PUBKEY=ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDcrfliAKMvi8+kzOTWe/+Ewija0I69NJaRq4qgGJZOmVoK41qkRwR31k3xgznIZtp1Y8+2nWz8wv2aOd9WGUxY9/fCLD8DE+BnYNWA6H44BIwj2/bPm9vx/j5Bo28t74CcZLo6OpHB1dl/MFHIWKVNvctriOapwIykIGueYoftPp1xuIBH3cOklZFxxXtA9kuw4yFcnFyVJqCnjgtgYHlUrnjUUKdl2jvM321UB0zWzOArlhdsEqUSB8+W6Z8OMv+LO2iDvFk3Kjs13qEZ2oyCBaL7OA7JzuQ9ql2X/iHxKQlY0C1qKVYLRMos5EV6qz9+ZGVSq8eCwGutBoMlFsJKGCq4OCyuiATZ+Xq8EYbtZTmOTOuf+2cnWzWbU69jlbiGLjLBP1nmMQiPYJ776ebyu/gXv843Vlw1nFr0TJgFJ1WHoTm74ifGoUOwukVMFlRVrofSEgjt6PMGdH5pom3lwUi+48ZVV5g/PzDQ3wmZI0nE35YiDhrrRair6k1YWHk= root@6260f0c5bef4
 
 volumes:
   sonarqube_data:

@@ -1,0 +1,45 @@
+pipeline {
+    agent any
+    
+	tools{
+		maven "MAVEN3"
+		jdk "JDK17"
+	}
+    stages {
+        stage('Checkout') {
+            steps {
+				git branch: 'main', url: 'https://github.com/r0jjames/acn-backend-holiday-assignment.git'
+			}
+        }
+        
+       stage('Build') {
+			steps{
+				dir("holiday") {
+				sh 'mvn clean install  -DskipTests'
+				}
+			}
+			post{
+				success {
+					echo 'Archiving artifacts now.'
+					archiveArtifacts artifacts: '**/target/*.jar'
+				}
+			}
+		}
+        
+        stage('Stop Application') {
+            steps {
+                // Stop any existing application running on port 8080
+                sh "fuser -k 8080/tcp || true"
+            }
+        }
+        
+        stage('Run') {
+            steps {
+                // Run the Spring Boot application
+                dir("target") {
+                    sh 'java -jar *.jar &'
+                }
+            }
+        }
+    }
+}
